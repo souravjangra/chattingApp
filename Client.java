@@ -53,7 +53,7 @@ public class Client
 		// end ctrl D/C
 		output.close();
 		sc.close();
-		client.close();				
+		client.close();
 	}
 }
 
