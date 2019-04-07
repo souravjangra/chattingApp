@@ -14,77 +14,76 @@ import javax.swing.text.html.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ClientGui extends Threads
+
+public class ClientGUI extends Thread
 {
-	final JTextPane jtextFilDiscu = new JTextPane();
-	final JtextPane jtextListUsers= new JTextPane();
-	final JTextField jtextInputChat = new jTextField();
-	private String oldMsg="";
-	private Thread read;
-	private String serverName;
-	private int PORT;
-	private String name;
-	BufferedReader input;
-	PrintWriter output;
-	Socket server;
+  final JTextPane jtextFilDiscu = new JTextPane();
+  final JTextPane jtextListUsers = new JTextPane();
+  final JTextField jtextInputChat = new JTextField();
+  private String oldMsg = "";
+  private Thread read;
+  private String serverName;
+  private int PORT;
+  private String name;
+  BufferedReader input;
+  PrintWriter output;
+  Socket server;
 
-	public ClientGui()
-	{
-		// all these would appear in the starting 
-		this.serverName ="localhost";
-		this.port=12345;
-		this.name="nickname";
+  public ClientGUI() {
+    this.serverName = "localhost";
+    this.PORT = 12345;
+    this.name = "nickname";
 
-		String fontfamily ="Arial, sans-serif ";
-		Font font =new Font (fontfamily,Font.PLAIN,15);
-		
-		final JFrame jfr = new JFrame("Chat");// name of window title
-		jfr.getContentPane().setLayout(NULL);
-		jfr.setSize(700,500);
-		jfr.setResizable(false);
-		jfr.setDefaultCloseOperations(JFrame.EXIT_ON_CLOSE);
+    String fontfamily = "Arial, sans-serif";
+    Font font = new Font(fontfamily, Font.PLAIN, 15);
 
-		// for the dicussion
-		jtextFilDiscu.setBounds(25,25,490,320);
-		jtextFilDiscu.setFont(font);
-		jtextFilDiscu.setMargin(new Insets(6,6,6,6));
-		jtextFilDiscu.setEditable(false);
-		JScrollPane jtextFilDiscuSp = new JScrollPane(jtextFilDiscu);
-		jtextFilDiscuSp.setBounds(25,25,490,320);
+    final JFrame jfr = new JFrame("Chat");// name of window title
+    jfr.getContentPane().setLayout(null);
+    jfr.setSize(700, 500);
+    jfr.setResizable(false);
+    jfr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		jtextFilDiscu.setContentType("text/html");
-		jtextFilDiscu.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,true);
-		
-		//pane on right which display all the users
-		jtextListUsers.setBounds(520, 25, 156, 320);
-	    jtextListUsers.setEditable(true);
-	    jtextListUsers.setFont(font);
-	    jtextListUsers.setMargin(new Insets(6, 6, 6, 6));
-	    jtextListUsers.setEditable(false);
-	    JScrollPane jsplistuser = new JScrollPane(jtextListUsers);
-	    jsplistuser.setBounds(520, 25, 156, 320);
-		
-		jtextListUsers.setContentType("text/html");
-		jtextListUsers.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,true);
+    // all these would appear in the starting 
+    jtextFilDiscu.setBounds(25, 25, 490, 320);
+    jtextFilDiscu.setFont(font);
+    jtextFilDiscu.setMargin(new Insets(6, 6, 6, 6));
+    jtextFilDiscu.setEditable(false);
+    JScrollPane jtextFilDiscuSP = new JScrollPane(jtextFilDiscu);
+    jtextFilDiscuSP.setBounds(25, 25, 490, 320);
 
-		// user input text feild
-		jtextInputChat.setBounds(0,350,400,50);
-		jtextInputChat.setFont(font);
-		jtextInputChat.setMargin(new Insets(6,6,6,6));
-		final JScrollPane jtextInputChat= new JScrollPane(jtextInputChat);
-		jtextFilDiscuSp.setBounds(23,350,650,50);
+    jtextFilDiscu.setContentType("text/html");
+    jtextFilDiscu.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
 
-		//button send
-		final JButton jsbtn = new JButton("send");
-		jsbtn.setBounds(575,410,100,35);
-		jsbtn.setBounds(575,410,100,35);
+    //pane on right which display all the users
+    jtextListUsers.setBounds(520, 25, 156, 320);
+    jtextListUsers.setEditable(true);
+    jtextListUsers.setFont(font);
+    jtextListUsers.setMargin(new Insets(6, 6, 6, 6));
+    jtextListUsers.setEditable(false);
+    JScrollPane jsplistuser = new JScrollPane(jtextListUsers);
+    jsplistuser.setBounds(520, 25, 156, 320);
 
-		// button Disconnect
-		final JButton jsbtndeco = new JButton("Disconnect");
-		jsbtndeco.setFont(font);
-		jsbtndeco.setBouds(25,410,130,35);
+    jtextListUsers.setContentType("text/html");
+    jtextListUsers.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
 
-		jtextInputChat.addKeyListener(new KeyAdapter() {
+    // Field message user input
+    jtextInputChat.setBounds(0, 350, 400, 50);
+    jtextInputChat.setFont(font);
+    jtextInputChat.setMargin(new Insets(6, 6, 6, 6));
+    final JScrollPane jtextInputChatSP = new JScrollPane(jtextInputChat);
+    jtextInputChatSP.setBounds(25, 350, 650, 50);
+
+    // button send
+    final JButton jsbtn = new JButton("Send");
+    jsbtn.setFont(font);
+    jsbtn.setBounds(575, 410, 100, 35);
+
+    // button Disconnect
+    final JButton jsbtndeco = new JButton("Disconnect");
+    jsbtndeco.setFont(font);
+    jsbtndeco.setBounds(25, 410, 130, 35);
+
+    jtextInputChat.addKeyListener(new KeyAdapter() {
       // send message on Enter
       public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -102,51 +101,52 @@ public class ClientGui extends Threads
           String currentMessage = jtextInputChat.getText().trim();
           jtextInputChat.setText(oldMsg);
           oldMsg = currentMessage;
-        	}
-      	}
+        }
+      }
+    });
 
-    	});
-		// click on send button 
-		jsbtn.addKeyListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ae)
-			{
-				sendMessage();
-			}
-		});
+    // Click on send button
+    jsbtn.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent ae) {
+        sendMessage();
+      }
+    });
 
-		//connection view 
-		final JTextField jtfName = new JTextField(this.name);
-	    final JTextField jtfport = new JTextField(Integer.toString(this.PORT));
-	    final JTextField jtfAddr = new JTextField(this.serverName);
-	    final JButton jcbtn = new JButton("Connect");
+    // Connection view
+    final JTextField jtfName = new JTextField(this.name);
+    final JTextField jtfport = new JTextField(Integer.toString(this.PORT));
+    final JTextField jtfAddr = new JTextField(this.serverName);
+    final JButton jcbtn = new JButton("Connect");
 
-	    //check if those fields are not empty
-	    jtfName.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
-	    jtfport.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
-    	jtfAddr.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
+    // check if those field are not empty
+    jtfName.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
+    jtfport.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
+    jtfAddr.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
 
-    	// position the stuffs
-	    jcbtn.setFont(font);
-	    jtfAddr.setBounds(25, 380, 135, 40);
-	    jtfName.setBounds(375, 380, 135, 40);
-	    jtfport.setBounds(200, 380, 135, 40);
-	    jcbtn.setBounds(575, 380, 100, 40);
+    // position the stuffs
+    jcbtn.setFont(font);
+    jtfAddr.setBounds(25, 380, 135, 40);
+    jtfName.setBounds(375, 380, 135, 40);
+    
+    jtfport.setBounds(200, 380, 135, 40);
+    jcbtn.setBounds(575, 380, 100, 40);
 
-	    //color the default things
-	    jtextFilDiscu.setBackground(Color.LIGHT_GRAY);
-	    jtextListUsers.setBackground(Color.LIGHT_GRAY);
+    //color the default things
+    jtextFilDiscu.setBackground(Color.LIGHT_GRAY);
+    jtextListUsers.setBackground(Color.LIGHT_GRAY);
 
-	    // add the elements to the frame
-        jfr.add(jcbtn);
-	    jfr.add(jtextFilDiscuSP);
-	    jfr.add(jsplistuser);
-	    jfr.add(jtfName);
-	    jfr.add(jtfport);
-	    jfr.add(jtfAddr);
-	    jfr.setVisible(true);
+    // add the elements to the frame
+    jfr.add(jcbtn);
+    jfr.add(jtextFilDiscuSP);
+    jfr.add(jsplistuser);
+    jfr.add(jtfName);
+    jfr.add(jtfport);
+    jfr.add(jtfAddr);
+    jfr.setVisible(true);
 
-	    appendToPane(jtextFilDiscu, "<h4>Welcome Aliens:</h4>"
+
+    // Starting text
+    appendToPane(jtextFilDiscu, "<h4>Welcome Aliens:</h4>"
         +"<ul>"
         +"<li><b>@nickname</b> ENter the nickname this would be yours public name what others will see if u are involved in any chatting </li>"
         +"<li><b>#d3961b</b> to change the color of her nickname to indicate hexadecimal code</li>"
@@ -154,8 +154,8 @@ public class ClientGui extends Threads
         +"<li><b>Use arrow </b>to resume the last message typed</li>"
         +"</ul><br/>");
 
-        // on connect 
-        jcbtn.addActionListener(new ActionListener() {
+    // On connect
+    jcbtn.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
         try {
           name = jtfName.getText();
@@ -277,7 +277,7 @@ public class ClientGui extends Threads
   }
 
   public static void main(String[] args) throws Exception {
-    ClientGui client = new ClientGui();
+    ClientGUI client = new ClientGUI();
   }
 
   // read new incoming messages

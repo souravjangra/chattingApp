@@ -28,7 +28,7 @@
         </menus>
       </MenuBar>
       <SplitPane layoutX="132.0" layoutY="32.0" prefHeight="307.0" prefWidth="469.0" AnchorPane.leftAnchor="132.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="32.0" />
-      <ListView layoutY="39.0" prefHeight="307.0" prefWidth="132.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="468.0" AnchorPane.topAnchor="32.0" />
+      <ListView layoutY="32.0" prefHeight="307.0" prefWidth="132.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="468.0" AnchorPane.topAnchor="32.0" />
       <Button layoutX="521.0" layoutY="355.0" mnemonicParsing="false" text="Send" />
       <TextArea layoutX="17.0" layoutY="344.0" prefHeight="48.0" prefWidth="492.0" />
    </children>
