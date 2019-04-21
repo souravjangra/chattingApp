@@ -10,13 +10,132 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.awt.Color;
+import java.io.*;
+import java.util.*;
+import java.io.File;
 
+class message implements Serializable
+{
+  public String user;
+  public String messageStr;
+  message(String user,String messageStr)
+    {
+        this.user=user;
+        this.messageStr=messageStr;
+    }
+    public String toString() {
+        return this.user + " : " + this.messageStr ;
+    }
+}
+class serialisation implements Serializable
+{
+    //public String chats="";
+    message mObj;
+    ArrayList<message> chatList = new ArrayList<>();
+    public boolean addMessage(String User,String tempChat)
+    {
+        //this.chats=this.chats+tempChat; 
+        mObj= new message(User,tempChat);
+        try
+        {
+          // if the .ser already exist take the data from it and append the data to it, otherwise make new .ser object
+            if(doesExist("messages.ser"))
+            {
+              ArrayList<message> node = new ArrayList<message>();
+              try
+              {
+                FileInputStream file = new FileInputStream("messages.ser"); 
+                ObjectInputStream in = new ObjectInputStream(file);
+                // Method for deserialization of object 
+                node = (ArrayList)in.readObject(); // type casting it
+                //object1.mObj.chats+=tempChat;
+                //node+=User+"|"+tempChat+"|";
+                node.add(mObj);
+                in.close();
+                file.close();
+              }
+              catch(Exception e)
+              {
+                System.out.println("error at reading .ser");
+              }
+              try
+              {
+                FileOutputStream fs = new FileOutputStream("messages.ser");
+                ObjectOutputStream os = new ObjectOutputStream(fs);
+                os.writeObject(node);
+                os.close(); 
+              }
+              catch(Exception e)
+              {
+                System.out.println("error at writing .ser");
+              }
+            }
+            else
+            {
+              FileOutputStream fs = new FileOutputStream("messages.ser");
+              ObjectOutputStream os = new ObjectOutputStream(fs);
+              //String nodeChat=User+"|"+tempChat+"|";
+              chatList.add(mObj);
+              os.writeObject(chatList);
+              os.close();
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }     
+      return true;
+    }
+    public boolean doesExist(String fileName)
+    {
+      String currPath=System.getProperty("user.dir");
+        System.out.println("Working Directory = " +currPath);
+        boolean check = new File(currPath,fileName).exists();
+      if(check)
+        return true;
+      else
+        return false;
+    }
+    public void readSerFile()
+    {
+        try
+        {    
+            // Reading the object from a file 
+            FileInputStream file = new FileInputStream("messages.ser"); 
+            ObjectInputStream in = new ObjectInputStream(file);
+            // Method for deserialization of object 
+            ArrayList<message> object1= new ArrayList<>();
+            object1 = (ArrayList)in.readObject(); // type casting it 
+            in.close(); 
+            file.close(); 
+            System.out.println("Object has been deserialized "); 
+            //System.out.println(object1.chatList);
+            for(message i :object1)
+            {
+              System.out.println(i);
+            }
+        } 
+          
+        catch(IOException ex) 
+        { 
+            System.out.println("IOException is caught"); 
+        } 
+          
+        catch(ClassNotFoundException ex) 
+        { 
+            System.out.println("ClassNotFoundException is caught"); 
+        }
+         
+    }
+
+}
 public class Server 
 {
   private int port;
   private List<User> clients;
   private ServerSocket server;
-
+  private serialisation serObject= new serialisation();
   public static void main(String[] args) throws IOException 
   {
     new Server(8080).run();
@@ -57,12 +176,12 @@ public class Server
       this.clients.add(newUser);
 
       // Welcome msg
-      /*newUser.getOutStream().println(
+      newUser.getOutStream().println(
           "<img src='https://www.kizoa.fr/img/e8nZC.gif' height='42' width='42'>"
           + "<b>Welcome</b> " + newUser.toString() +
           "<img src='https://www.kizoa.fr/img/e8nZC.gif' height='42' width='42'>"
           );
-      */
+      
       // create a new thread for newUser handling
       new Thread(new UserHandler(this, newUser)).start();
     }
@@ -75,9 +194,17 @@ public class Server
 
   // send incoming msg to all Users
   public void broadcastMessages(String msg, User userSender) {
+    try{
+        serObject.addMessage(userSender.getNickname(),msg);
+        System.out.println("call at 202 ");
+      }
+      catch (Exception ex)
+      {
+        System.out.println("something went wrong");
+      }
     for (User client : this.clients) {
-      client.getOutStream().println(
-          userSender.toString() + "<span>: " + msg+"</span>");
+    client.getOutStream().println(
+        "The message from "+userSender.toString() + " is <span>: " + msg+"</span>");
     }
   }
 
@@ -149,13 +276,18 @@ class UserHandler implements Runnable {
         }
 
       // Gestion du changement
-      }else if (message.charAt(0) == '#'){
+      }
+      else if (message.charAt(0) == '#'){
         user.changeColor(message);
         // update color for all other users
         this.server.broadcastAllUsers();
-      }else{
-        // update user list
-        server.broadcastMessages(message, user);
+      }
+      else
+      {
+        if(message.length()==0)
+          ;
+        else
+          server.broadcastMessages(message, user);
       }
     }
     // end of Thread
