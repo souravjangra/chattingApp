@@ -37,15 +37,15 @@ public class Server
         this.close();
       }
     };
-    System.out.println("Port 12345 is now open.");
+    System.out.println("Port "+port+" is now open.");
 
-    while (true) 
+    while (true)
     {
       // accepts a new client
       Socket client = server.accept();
-
       // get nickname of newUser
       String nickname = (new Scanner ( client.getInputStream() )).nextLine();
+      //String nickname="loneWolf";
       nickname = nickname.replace(",", ""); //  ',' use for serialisation
       nickname = nickname.replace(" ", "_");
       System.out.println("New Client: \"" + nickname + "\"\n\t     Host:" + client.getInetAddress().getHostAddress());
@@ -53,17 +53,17 @@ public class Server
       // create new User
       User newUser = new User(client, nickname);
 
-      // add newUser message to list
+      // add newUser to list
       this.clients.add(newUser);
 
       // Welcome msg
-      newUser.getOutStream().println(
+      /*newUser.getOutStream().println(
           "<img src='https://www.kizoa.fr/img/e8nZC.gif' height='42' width='42'>"
           + "<b>Welcome</b> " + newUser.toString() +
           "<img src='https://www.kizoa.fr/img/e8nZC.gif' height='42' width='42'>"
           );
-
-      // create a new thread for newUser incoming messages handling
+      */
+      // create a new thread for newUser handling
       new Thread(new UserHandler(this, newUser)).start();
     }
   }
@@ -123,7 +123,6 @@ class UserHandler implements Runnable {
     Scanner sc = new Scanner(this.user.getInputStream());
     while (sc.hasNextLine()) {
       message = sc.nextLine();
-
       // smiley
       message = message.replace(":)", "<img src='http://4.bp.blogspot.com/-ZgtYQpXq0Yo/UZEDl_PJLhI/AAAAAAAADnk/2pgkDG-nlGs/s1600/facebook-smiley-face-for-comments.png'>");
       message = message.replace(":D", "<img src='http://2.bp.blogspot.com/-OsnLCK0vg6Y/UZD8pZha0NI/AAAAAAAADnY/sViYKsYof-w/s1600/big-smile-emoticon-for-facebook.png'>");
@@ -136,7 +135,7 @@ class UserHandler implements Runnable {
       message = message.replace(":o", "<img src='http://1.bp.blogspot.com/-MB8OSM9zcmM/TvitChHcRRI/AAAAAAAAAiE/kdA6RbnbzFU/s400/surprised%2Bemoticon.png'>");
       message = message.replace(":O", "<img src='http://1.bp.blogspot.com/-MB8OSM9zcmM/TvitChHcRRI/AAAAAAAAAiE/kdA6RbnbzFU/s400/surprised%2Bemoticon.png'>");
 
-      // Gestion des messages private
+      // detect if message was privately sent
       if (message.charAt(0) == '@'){
         if(message.contains(" ")){
           System.out.println("private msg : " + message);

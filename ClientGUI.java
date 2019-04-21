@@ -1,3 +1,9 @@
+// some highlights
+// add the memory
+// message encryption
+// notification push messages
+// make the feature that u can send the chat archive via mail
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +37,7 @@ public class ClientGUI extends Thread
 
   public ClientGUI() {
     this.serverName = "localhost";
-    this.PORT = 12345;
+    this.PORT = 8080;
     this.name = "nickname";
 
     String fontfamily = "Arial, sans-serif";
@@ -295,7 +301,7 @@ public class ClientGUI extends Thread
               ArrayList<String> ListUser = new ArrayList<String>(
                   Arrays.asList(message.split(", "))
                   );
-              // showing the user details each and every time a new message is reaceived
+              // showing the user details each and every time a new message is received
               jtextListUsers.setText(null);
               for (String user : ListUser) {
                 appendToPane(jtextListUsers, "@" + user);
